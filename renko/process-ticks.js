@@ -5,7 +5,6 @@ const kite = require('../common/kite-service');
 const alphaVantage = require('../common/alphavantage-data');
 
 const axios = require('axios');
-let hell;
 //-------------------mongo db starts here------------------------
 const MongoClient = require("mongodb").MongoClient;
 const mongodbHost = "@ds143754.mlab.com";
@@ -74,7 +73,8 @@ function getPrevDayHistoricalData(instrument) {
       close: close,
       period: 7
     }
-    const calculatedATR = ATR.calculate(input);
+    let calculatedATR = ATR.calculate(input);
+    calculatedATR = calculatedATR[calculatedATR.length - 1];
     const lastHigh = high[high.length - 1];
     const lastLow = low[low.length - 1];
     const up = (lastHigh + lastLow) / 2 + (multiplier * calculatedATR);
@@ -117,9 +117,10 @@ const Ticks = {
     console.log("renko data before format", renkoFormat);
     let renkoConvert = renko.renkoBrick(renkoFormat, brickSize);
     let trima = await tulind.indicators.trima.indicator([renkoConvert.close],[10]);
+    trima = trima[0][trima.length - 1];
     let aroon = await tulind.indicators.aroon.indicator([renkoConvert.high, renkoConvert.low],[4]);
     let aroonUp = aroon[0][aroon[0].length - 1];
-    let aroonDown = aroon[0][aroon[1].length - 1];
+    let aroonDown = aroon[1][aroon[1].length - 1];
     let superTrend = calculateSuperTrend(renkoConvert.high, renkoConvert.low, renkoConvert.close, 3)
     console.log("...................renko...................", renkoConvert);
     processingEngine.initiate(renkoConvert, ticks, brickSize, trima, aroonUp, aroonDown, superTrend);

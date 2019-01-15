@@ -2,7 +2,7 @@ let profit = 0;
 let tradingPrice = 0;
 sellOrBuy = "";
 let tradeInitiated = false;
-const taradedAmount = 4000;
+const taradedAmount = 1;
 const LTPThreshold = 0.45;
 const kiteService = require("./kite.service");
 const kite = require("../renko/kite.service");
@@ -51,7 +51,7 @@ async function sell(price, quantity) {
     console.log(err);
   }
 
-  if (!response.error) {
+  if (response.status !== 'error') {
     console.log('sell');
   }
 }
@@ -66,7 +66,7 @@ async function buy(price, quantity) {
     console.log(err);
   }
 
-  if (!response.error) {
+  if (response.status !== 'error') {
     console.log('bought');
   }
 }
