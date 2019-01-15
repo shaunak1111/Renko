@@ -3,7 +3,9 @@ const hist = require('./renko/Ticks.service');
 const Gautham = require('./renko/Dummy');
 const fs = require('fs');
 
-const kite =  require('./renko/kite.service');
+const axios = require('axios');
+// const kite =  require('./renko/kite.service');
+const kite =  require('./common/kite-service');
 
 // const data = hist.getAlphaVantageData().then((data) => {
 //     // console.log(data.data['Time Series (1min)']);
@@ -38,5 +40,16 @@ const kite =  require('./renko/kite.service');
 // });
 
 kite.KITE.generateTicks();
+
+// (async () => {
+//   try {
+//     let url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=NSE:SBIN&interval=1min&outputsize=compact&apikey=WGVGWXN6LCM013NN`;
+//     let res = await axios.get(url)
+//     console.log(res)
+//   }catch (e) {
+//     console.log(e)
+//   }
+//   console.log(45)
+// })();
 
 // kite.getInstruments();

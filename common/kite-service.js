@@ -1,4 +1,3 @@
-'use strict';
 // api secret rzgyg4edlvcurw4vp83jl5io9b610x94
 // api key dysoztj41hntm1ma
 
@@ -10,15 +9,15 @@
 
 const API_SECRET = "rzgyg4edlvcurw4vp83jl5io9b610x94";
 const API_KEY = "dysoztj41hntm1ma";
-const REQ_TOKEN = "MWYO5VUoQZ5e2SF55L8MAjVfEaDnbt5O";
-let access_token = "";
+const REQ_TOKEN = "vzOjzo6JL4aWKxZ8BycG9B0j7q4nvVcy";
+let access_token = "WxIaZMy8hBiyq1OGTTwloIdk4jB6nrxq";
 
 const KiteConnect = require("kiteconnect").KiteConnect;
 
 let KiteTicker = require("kiteconnect").KiteTicker;
 let ticker;
 
-const processTicks = require("./process-ticks");
+const processTicks = require("../renko/process-ticks");
 
 const kc = new KiteConnect({
   api_key: API_KEY,
@@ -35,25 +34,31 @@ function accessTokenGenerator() {
 
 const KITE = {
   generateTicks: async () => {
-    if (access_token === "") {
+    if (access_token === '') {
       try {
         let token = await accessTokenGenerator();
         access_token = token.access_token;
         console.log("acess token", access_token);
       } catch (err) {
-        console.log("err");
+        console.log("err", err);
         return err;
       }
     }
 
-  ticker = new KiteTicker({
+  try {
+    ticker = new KiteTicker({
       api_key: API_KEY,
       access_token: access_token
     });
+  } catch (e) {
+    console.log('ticker', e);
+  }
+
     ticker.connect();
     ticker.on("connect", subscribe);
     ticker.on("ticks", onTicks);
     ticker.autoReconnect(true, 300, 20);
+    console.log('connected', ticker.connected());
     ticker.on("reconnecting", function(reconnect_interval, reconnections) {
       console.log(
         "Reconnecting: attempt - ",
@@ -65,36 +70,40 @@ const KITE = {
     ticker.on("noreconnect", function() {
       console.log("noreconnect");
     });
+    ticker.on('error', (error) => {
+      console.log('error', error);
+    })
   },
   getInstruments: function() {
     kc.getInstruments(["NSE"]).then(res => {
       console.log("insruments", res);
     });
   },
-  buy: function(price, quantity) {
+  buy: function(price, quantity, symbol, type) {
     return kc.placeOrder("regular", {
       exchange: "NSE",
-      tradingsymbol: "SBIN",
+      tradingsymbol: symbol,
       transaction_type: "BUY",
       quantity: quantity,
       product: "MIS",
-      order_type: "LIMIT",
+      order_type: type,
       validity: "DAY",
       price: price
     });
   },
-  sell: (price, quantity) => {
+  sell: (price, quantity, symbol, type) => {
     return kc.placeOrder("regular", {
       exchange: "NSE",
-      tradingsymbol: "SBIN",
+      tradingsymbol: symbol,
       transaction_type: "SELL",
       quantity: quantity,
       product: "MIS",
-      order_type: "LIMIT",
+      order_type: type,
       validity: "DAY",
       price: price
     });
-  }
+  },
+  getkite: () => kc
 };
 
 function saveDataToMLab() {}
@@ -108,7 +117,6 @@ function generateOHLC(ticks) {
 }
 
 function onTicks(ticks) {
-  console.log('ticks', ticks);
   if (previousTime === undefined) {
     previousTime = ticks[0].last_trade_time;
     OHLC.open = ticks[0].last_price;
@@ -118,6 +126,9 @@ function onTicks(ticks) {
     generateOHLC(ticks[0]);
   }
   let diff = Math.abs(ticks[0].last_trade_time - previousTime);
+  // TODO delete this
+  processTicks.buildRenkoWithFixedBricks(ticks[0], OHLC, 0.39);
+
   // dividing by 1000 * 60 gives the minute difference
   if (diff / (1000 * 60) >= 1) {
     OHLC.close = ticks[0].last_price;
