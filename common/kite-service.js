@@ -9,8 +9,8 @@
 
 const API_SECRET = "rzgyg4edlvcurw4vp83jl5io9b610x94";
 const API_KEY = "dysoztj41hntm1ma";
-const REQ_TOKEN = "vzOjzo6JL4aWKxZ8BycG9B0j7q4nvVcy";
-let access_token = "WxIaZMy8hBiyq1OGTTwloIdk4jB6nrxq";
+const REQ_TOKEN = "EjGptx8qf1wC9P1S1dHH215ovsQTr0m4";
+let access_token = "DGPtttecjC0AtREpFfqjAa1vqYIHz6zB";
 
 const KiteConnect = require("kiteconnect").KiteConnect;
 
@@ -19,10 +19,7 @@ let ticker;
 
 const processTicks = require("../renko/process-ticks");
 
-const kc = new KiteConnect({
-  api_key: API_KEY,
-  access_token: access_token
-});
+let kc;
 
 let interval;
 let previousTime;
@@ -46,12 +43,17 @@ const KITE = {
     }
 
   try {
+    kc = new KiteConnect({
+      api_key: API_KEY,
+      access_token: access_token
+    });
+
     ticker = new KiteTicker({
       api_key: API_KEY,
       access_token: access_token
     });
   } catch (e) {
-    console.log('ticker', e);
+    console.log('kite error', e);
   }
 
     ticker.connect();
@@ -126,14 +128,12 @@ function onTicks(ticks) {
     generateOHLC(ticks[0]);
   }
   let diff = Math.abs(ticks[0].last_trade_time - previousTime);
-  // TODO delete this
-  processTicks.buildRenkoWithFixedBricks(ticks[0], OHLC, 0.39);
 
   // dividing by 1000 * 60 gives the minute difference
   if (diff / (1000 * 60) >= 1) {
     OHLC.close = ticks[0].last_price;
     console.log("ticks", ticks[0], "OHLC", OHLC);
-    processTicks.buildRenkoWithFixedBricks(ticks[0], OHLC, 0.39);
+    processTicks.buildRenkoWithFixedBricks(ticks[0], OHLC, 0.50);
     previousTime = ticks[0].last_trade_time;
     // the current close is the next open for the OHLC
     OHLC.open = ticks[0].last_price;

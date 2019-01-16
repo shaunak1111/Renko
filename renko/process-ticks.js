@@ -1,10 +1,10 @@
 const renko = require("./index");
 const processingEngine = require("./kite-order");
-const tulind = require('tulind');
-const kite = require('../common/kite-service');
-const alphaVantage = require('../common/alphavantage-data');
+const tulind = require("tulind");
+const kite = require("../common/kite-service");
+const alphaVantage = require("../common/alphavantage-data");
 
-const axios = require('axios');
+const axios = require("axios");
 //-------------------mongo db starts here------------------------
 const MongoClient = require("mongodb").MongoClient;
 const mongodbHost = "@ds143754.mlab.com";
@@ -48,8 +48,7 @@ async function saveData(obj) {
 
 function getPrevDayHistoricalData(instrument) {
   //-------------- uncomment after this for kite historical data---------------
-  
-  // let prevDate = new Date();    
+  // let prevDate = new Date();
   // prevDate.setDate(prevDate.getDate() - 1);
   // let kc = kite.KITE.getkite();
   //  let data = await kc.getHistoricalData(instrument,'minute', prevDate, new Date());
@@ -61,41 +60,40 @@ function getPrevDayHistoricalData(instrument) {
   //   renkoFormat.close.push(items[4]);
   //   renkoFormat.volume.push(items[5]);
   // });
-
   //------------- uncomment ends here ---------------------------
 }
 
-  function calculateSuperTrend(high, low, close, multiplier) {
-    const ATR = require('technicalindicators').ATR;
-    const input = {
-      high: high,
-      low: low,
-      close: close,
-      period: 7
-    }
-    let calculatedATR = ATR.calculate(input);
-    calculatedATR = calculatedATR[calculatedATR.length - 1];
-    const lastHigh = high[high.length - 1];
-    const lastLow = low[low.length - 1];
-    const up = (lastHigh + lastLow) / 2 + (multiplier * calculatedATR);
-    const down = (lastHigh + lastLow) / 2 - (multiplier * calculatedATR);
-    return {
-      up: up,
-      down: down
-    }
-  } 
+function calculateSuperTrend(high, low, close, multiplier) {
+  const ATR = require("technicalindicators").ATR;
+  const input = {
+    high: high,
+    low: low,
+    close: close,
+    period: 7
+  };
+  let calculatedATR = ATR.calculate(input);
+  calculatedATR = calculatedATR[calculatedATR.length - 1];
+  const lastHigh = high[high.length - 1];
+  const lastLow = low[low.length - 1];
+  const up = (lastHigh + lastLow) / 2 + multiplier * calculatedATR;
+  const down = (lastHigh + lastLow) / 2 - multiplier * calculatedATR;
+  return {
+    up: up,
+    down: down
+  };
+}
 async function processTicks(ticks, OHLC, prevData = undefined) {
-    // Mongo
+  // Mongo
   // get previous data from mlab
-//   if (renkoFormat.close.length === 0) {
-//     let data = mongoConnect;
-//     if (data[0].close > 0) {
-//         renkoFormat = mongoConnect();
-//     }
-//   }
+  //   if (renkoFormat.close.length === 0) {
+  //     let data = mongoConnect;
+  //     if (data[0].close > 0) {
+  //         renkoFormat = mongoConnect();
+  //     }
+  //   }
 
   // new data has not been genereated genereate previous day data
-  if (prevData) {
+  if (renkoFormat.close.length === 0) {
     renkoFormat = alphaVantage.processAlphavantageData(prevData);
   }
 
@@ -112,18 +110,51 @@ async function processTicks(ticks, OHLC, prevData = undefined) {
 
 const Ticks = {
   buildRenkoWithFixedBricks: async function(ticks, OHLC, brickSize) {
-    let data = await alphaVantage.getAlphaVantageData('NSE:SBIN','1min');
-    processTicks(ticks, OHLC, Array.prototype.reverse.apply(data.data['Time Series (1min)']));
+    let data = await alphaVantage.getAlphaVantageData("NSE:SBIN", "1min");
+    processTicks(
+      ticks,
+      OHLC,
+      Array.prototype.reverse.apply(data.data["Time Series (1min)"])
+    );
     console.log("renko data before format", renkoFormat);
     let renkoConvert = renko.renkoBrick(renkoFormat, brickSize);
-    let trima = await tulind.indicators.trima.indicator([renkoConvert.close],[10]);
+    let trima = await tulind.indicators.trima.indicator(
+      [renkoConvert.close],
+      [10]
+    );
     trima = trima[0][trima.length - 1];
-    let aroon = await tulind.indicators.aroon.indicator([renkoConvert.high, renkoConvert.low],[4]);
-    let aroonUp = aroon[0][aroon[0].length - 1];
-    let aroonDown = aroon[1][aroon[1].length - 1];
-    let superTrend = calculateSuperTrend(renkoConvert.high, renkoConvert.low, renkoConvert.close, 3)
+    let aroon = await tulind.indicators.aroon.indicator(
+      [renkoConvert.high, renkoConvert.low],
+      [4]
+    );
+    let aroonDown = aroon[0][aroon[0].length - 1];
+    let aroonUp = aroon[1][aroon[1].length - 1];
+    let superTrend = calculateSuperTrend(
+      renkoConvert.high,
+      renkoConvert.low,
+      renkoConvert.close,
+      3
+    );
     console.log("...................renko...................", renkoConvert);
-    processingEngine.initiate(renkoConvert, ticks, brickSize, trima, aroonUp, aroonDown, superTrend);
+    console.log(
+      "--trima---",
+      trima,
+      "aroon up",
+      aroonUp,
+      "aroon down",
+      aroonDown,
+      "super trend",
+      superTrend
+    );
+    processingEngine.initiate(
+      renkoConvert,
+      ticks,
+      brickSize,
+      trima,
+      aroonUp,
+      aroonDown,
+      superTrend
+    );
   }
 };
 

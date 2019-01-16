@@ -24,18 +24,34 @@ const Gautham = {
 
       // if prev is green and current is green
       if (
-        LTP <= up &&
+        !tradeInitiated &&
+        LTP < up &&
         aroonUp > aroonDown &&
-        trima >= LTP
+        trima < LTP
       ) {
         buy(LTP, taradedAmount);
         // prev red and current red
       } else if (
-        LTP >= down &&
+        !tradeInitiated &&
+        LTP > down &&
         aroonDown > aroonUp &&
-        LTP <= trima
+        trima > LTP
       ) {
         sell(LTP, taradedAmount);
+      } else if (
+        tradeInitiated &&
+        sellOrBuy === 'buy' &&
+        LTP > down &&
+        aroonDown > aroonUp &&
+        trima > LTP) { // sell after buy trade initiated
+          sell(LTP, taradedAmount);
+      } else if (
+        tradeInitiated &&
+        sellOrBuy === 'sell' &&
+        LTP < up &&
+        aroonUp > aroonDown &&
+        trima < LTP) { // buy after sell trade initiated
+          buy(LTP, taradedAmount);
       }
     console.log("profit", profit);
   }
@@ -46,13 +62,14 @@ async function sell(price, quantity) {
   let response;
   try {
     response = await kite.KITE.sell(price, quantity);
-    console.log("sell", response);
   } catch (err) {
     console.log(err);
   }
 
   if (response.status !== 'error') {
-    console.log('sell');
+    tradeInitiated = !tradeInitiated;
+    sellOrBuy = 'sell';
+    console.log('sell order success');
   }
 }
 
@@ -61,13 +78,14 @@ async function buy(price, quantity) {
   let response;
   try {
     response = await kite.KITE.buy(price, quantity);
-    console.log("buy", response);
   } catch (err) {
     console.log(err);
   }
 
   if (response.status !== 'error') {
-    console.log('bought');
+    tradeInitiated = !tradeInitiated;
+    sellOrBuy = 'buy';
+    console.log('buy order success');
   }
 }
 
