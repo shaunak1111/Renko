@@ -7,10 +7,9 @@ const mtz = require("moment-timezone");
 const moment = require("moment");
 
 const getHistData = {
-  getAlphaVantageData: (symbol, timeInterval) => {
-    return axios.get(
-      `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=NSE:SBIN&interval=1min&outputsize=compact&apikey=WGVGWXN6LCM013NN`
-    );
+  getAlphaVantageData: async function (symbol, timeInterval) {
+    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=${timeInterval}&outputsize=full&apikey=WGVGWXN6LCM013NN`
+    return await axios.get(url);
   },
   processAlphavantageData: data => {
     //    let date = moment('2018-12-17 04:59:00');
@@ -39,10 +38,6 @@ const getHistData = {
       renkoFormat.volume.push(parseFloat(data[dateObj]["5. volume"]));
       renkoFormat.timestamp.push(ISTdateFormatter(dateObj));
     });
-    // let ISTDate = moment
-    //   .tz("2018-12-17 04:59:00", "America/Toronto")
-    //   .tz("Asia/Kolkata");
-    // console.log("date", new Date(ISTDate.toString()).getTime());
     return renkoFormat;
   }
 };
