@@ -9,8 +9,8 @@
 
 const API_SECRET = "rzgyg4edlvcurw4vp83jl5io9b610x94";
 const API_KEY = "dysoztj41hntm1ma";
-const REQ_TOKEN = "EjGptx8qf1wC9P1S1dHH215ovsQTr0m4";
-let access_token = "DGPtttecjC0AtREpFfqjAa1vqYIHz6zB";
+const REQ_TOKEN = "dVySKGuXgaCEN3osI8uu0kXf1OgMWCOH";
+let access_token = "ZFlfHRfclTwu1upJpM3rGjSWZq72ZSIG";
 
 const KiteConnect = require("kiteconnect").KiteConnect;
 
@@ -19,7 +19,10 @@ let ticker;
 
 const processTicks = require("../renko/process-ticks");
 
-let kc;
+let kc = new KiteConnect({
+  api_key: API_KEY,
+  access_token: access_token
+});
 
 let interval;
 let previousTime;
@@ -36,6 +39,7 @@ const KITE = {
         let token = await accessTokenGenerator();
         access_token = token.access_token;
         console.log("acess token", access_token);
+        return;
       } catch (err) {
         console.log("err", err);
         return err;
@@ -47,7 +51,7 @@ const KITE = {
       api_key: API_KEY,
       access_token: access_token
     });
-
+    
     ticker = new KiteTicker({
       api_key: API_KEY,
       access_token: access_token
@@ -118,7 +122,7 @@ function generateOHLC(ticks) {
   }
 }
 
-function onTicks(ticks) {
+async function onTicks(ticks) {
   if (previousTime === undefined) {
     previousTime = ticks[0].last_trade_time;
     OHLC.open = ticks[0].last_price;
@@ -132,7 +136,7 @@ function onTicks(ticks) {
   // dividing by 1000 * 60 gives the minute difference
   if (diff / (1000 * 60) >= 1) {
     OHLC.close = ticks[0].last_price;
-    console.log("ticks", ticks[0], "OHLC", OHLC);
+    console.log("ticks", ticks[0]);
     processTicks.buildRenkoWithFixedBricks(ticks[0], OHLC, 0.50);
     previousTime = ticks[0].last_trade_time;
     // the current close is the next open for the OHLC

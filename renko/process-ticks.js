@@ -73,14 +73,76 @@ function calculateSuperTrend(high, low, close, multiplier) {
   };
   let calculatedATR = ATR.calculate(input);
   calculatedATR = calculatedATR[calculatedATR.length - 1];
-  const lastHigh = high[high.length - 1];
-  const lastLow = low[low.length - 1];
-  const up = (lastHigh + lastLow) / 2 + multiplier * calculatedATR;
-  const down = (lastHigh + lastLow) / 2 - multiplier * calculatedATR;
-  return {
-    up: up,
-    down: down
+
+  // calculation of last high prices
+  let lastHigh = high[high.length - 1];
+  let lastClose = close[close.length - 1];
+  let lastLow = low[low.length - 1];
+
+  // supertrend calculation starts
+  supertrend = {
+    upperBandBasic: 0,
+    lowerBandBasic: 0,
+    upperBand: 0,
+    lowerBand: 0,
+    supertrend: 0
   };
+  lastSupertrend = {
+    upperBandBasic: 0,
+    lowerBandBasic: 0,
+    upperBand: 0,
+    lowerBand: 0,
+    supertrend: 0
+  };
+  let lastCandleClose = 0;
+  supertrend.upperBandBasic =
+    (lastHigh + lastLow) / 2 + multiplier * calculatedATR;
+  supertrend.lowerBandBasic =
+    (lastHigh + lastLow) / 2 - multiplier * calculatedATR;
+
+  if (
+    supertrend.upperBandBasic < lastSupertrend.upperBand ||
+    lastCandleClose > lastSupertrend.upperBand
+  )
+    supertrend.upperBand = supertrend.upperBandBasic;
+  else {
+    supertrend.upperBand = lastSupertrend.upperBand;
+  }
+
+  if (
+    supertrend.lowerBandBasic > lastSupertrend.lowerBand ||
+    lastCandleClose < lastSupertrend.lowerBand
+  )
+    supertrend.lowerBand = supertrend.lowerBandBasic;
+  else {
+    supertrend.lowerBand = lastSupertrend.lowerBand;
+  }
+
+  if (
+    lastSupertrend.supertrend == lastSupertrend.upperBand &&
+    lastClose <= supertrend.upperBand
+  )
+    supertrend.supertrend = supertrend.upperBand;
+  else if (
+    lastSupertrend.supertrend == lastSupertrend.upperBand &&
+    lastClose >= supertrend.upperBand
+  )
+    supertrend.supertrend = supertrend.lowerBand;
+  else if (
+    lastSupertrend.supertrend == lastSupertrend.lowerBand &&
+    lastClose >= supertrend.lowerBand
+  )
+    supertrend.supertrend = supertrend.lowerBand;
+  else if (
+    lastSupertrend.supertrend == lastSupertrend.lowerBand &&
+    lastClose <= supertrend.lowerBand
+  ) {
+    supertrend.supertrend = supertrend.upperBand;
+  } else {
+    supertrend.supertrend = 0;
+  }
+
+  return supertrend.supertrend;
 }
 async function processTicks(ticks, OHLC, prevData = undefined) {
   // Mongo
@@ -118,13 +180,23 @@ const Ticks = {
     );
     console.log("renko data before format", renkoFormat);
     let renkoConvert = renko.renkoBrick(renkoFormat, brickSize);
+    let renkoLen = renkoConvert.close.length;
+
+    //-------------------Trima-------------------------------
+    let period = 10;
     let trima = await tulind.indicators.trima.indicator(
       [renkoConvert.close],
-      [10]
+      [period]
     );
-    trima = trima[0][trima.length - 1];
+    trima = trima[0][trima[0].length - 1];
+    //-----------------Trima ends------------------------
+
+    let aroonBarData = 15;
     let aroon = await tulind.indicators.aroon.indicator(
-      [renkoConvert.high, renkoConvert.low],
+      [
+        renkoConvert.high.slice(renkoLen - aroonBarData),
+        renkoConvert.low.slice(renkoLen - aroonBarData)
+      ],
       [4]
     );
     let aroonDown = aroon[0][aroon[0].length - 1];

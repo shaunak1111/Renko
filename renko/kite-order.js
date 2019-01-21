@@ -4,8 +4,7 @@ sellOrBuy = "";
 let tradeInitiated = false;
 const taradedAmount = 1;
 const LTPThreshold = 0.45;
-const kiteService = require("./kite.service");
-const kite = require("../renko/kite.service");
+const kite = require("../common/kite-service");
 
 const Gautham = {
   initiate: async function(
@@ -18,14 +17,13 @@ const Gautham = {
     superTrend
   ) {
     const { open, high, low, close, volume } = data;
-    const { up, down } = superTrend;
     const LTP = tick.last_price;
 
 
       // if prev is green and current is green
       if (
         !tradeInitiated &&
-        LTP < up &&
+        // LTP > superTrend &&
         aroonUp > aroonDown &&
         trima < LTP
       ) {
@@ -33,7 +31,7 @@ const Gautham = {
         // prev red and current red
       } else if (
         !tradeInitiated &&
-        LTP > down &&
+        // LTP < superTrend &&
         aroonDown > aroonUp &&
         trima > LTP
       ) {
@@ -41,14 +39,14 @@ const Gautham = {
       } else if (
         tradeInitiated &&
         sellOrBuy === 'buy' &&
-        LTP > down &&
+        // LTP < superTrend &&
         aroonDown > aroonUp &&
         trima > LTP) { // sell after buy trade initiated
           sell(LTP, taradedAmount);
       } else if (
         tradeInitiated &&
         sellOrBuy === 'sell' &&
-        LTP < up &&
+        // LTP > superTrend &&
         aroonUp > aroonDown &&
         trima < LTP) { // buy after sell trade initiated
           buy(LTP, taradedAmount);
@@ -61,7 +59,7 @@ async function sell(price, quantity) {
   // TODO - check response
   let response;
   try {
-    response = await kite.KITE.sell(price, quantity);
+    response = await kite.KITE.sell(price, quantity, 'SBIN', 'LIMIT');
   } catch (err) {
     console.log(err);
   }
@@ -77,7 +75,7 @@ async function buy(price, quantity) {
   // Todo -: check here
   let response;
   try {
-    response = await kite.KITE.buy(price, quantity);
+    response = await kite.KITE.buy(price, quantity, 'SBIN', 'LIMIT');
   } catch (err) {
     console.log(err);
   }
