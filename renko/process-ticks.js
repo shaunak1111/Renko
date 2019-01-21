@@ -69,10 +69,11 @@ function calculateSuperTrend(high, low, close, multiplier) {
     high: high,
     low: low,
     close: close,
-    period: 7
+    period: 10
   };
   let calculatedATR = ATR.calculate(input);
   calculatedATR = calculatedATR[calculatedATR.length - 1];
+  console.log('atr', calculatedATR);
 
   // calculation of last high prices
   let lastHigh = high[high.length - 1];
@@ -197,8 +198,9 @@ const Ticks = {
         renkoConvert.high.slice(renkoLen - aroonBarData),
         renkoConvert.low.slice(renkoLen - aroonBarData)
       ],
-      [4]
+      [5]
     );
+    console.log('aroon', aroon);
     let aroonDown = aroon[0][aroon[0].length - 1];
     let aroonUp = aroon[1][aroon[1].length - 1];
     let superTrend = calculateSuperTrend(

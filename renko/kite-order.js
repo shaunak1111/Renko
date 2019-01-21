@@ -4,6 +4,7 @@ sellOrBuy = "";
 let tradeInitiated = false;
 const taradedAmount = 1;
 const LTPThreshold = 0.45;
+const aroonThreshold = 50;
 const kite = require("../common/kite-service");
 
 const Gautham = {
@@ -24,7 +25,8 @@ const Gautham = {
       if (
         !tradeInitiated &&
         // LTP > superTrend &&
-        aroonUp > aroonDown &&
+        aroonDown <= aroonThreshold &&
+        aroonUp >= aroonThreshold &&
         trima < LTP
       ) {
         buy(LTP, taradedAmount);
@@ -32,7 +34,8 @@ const Gautham = {
       } else if (
         !tradeInitiated &&
         // LTP < superTrend &&
-        aroonDown > aroonUp &&
+        aroonDown >= aroonThreshold &&
+        aroonUp <= aroonThreshold &&
         trima > LTP
       ) {
         sell(LTP, taradedAmount);
@@ -40,14 +43,16 @@ const Gautham = {
         tradeInitiated &&
         sellOrBuy === 'buy' &&
         // LTP < superTrend &&
-        aroonDown > aroonUp &&
+        aroonDown >= aroonThreshold &&
+        aroonUp <= aroonThreshold &&
         trima > LTP) { // sell after buy trade initiated
           sell(LTP, taradedAmount);
       } else if (
         tradeInitiated &&
         sellOrBuy === 'sell' &&
         // LTP > superTrend &&
-        aroonUp > aroonDown &&
+        aroonDown <= aroonThreshold &&
+        aroonUp >= aroonThreshold &&
         trima < LTP) { // buy after sell trade initiated
           buy(LTP, taradedAmount);
       }
