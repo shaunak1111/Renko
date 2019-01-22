@@ -67,7 +67,7 @@ dispatcher.onGet("/", function(req, res) {
 // });
 
 //--------------------server code ends  here----------------------------
-
+console.log('hello');
 kite.KITE.generateTicks();
 
 // kite.getInstruments();
