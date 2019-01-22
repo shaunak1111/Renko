@@ -64,7 +64,7 @@ async function sell(price, quantity) {
   // TODO - check response
   let response;
   try {
-    response = await kite.KITE.sell(price, quantity, 'SBIN', 'LIMIT');
+    // response = await kite.KITE.sell(price, quantity, 'SBIN', 'LIMIT');
   } catch (err) {
     console.log(err);
   }
@@ -80,7 +80,7 @@ async function buy(price, quantity) {
   // Todo -: check here
   let response;
   try {
-    response = await kite.KITE.buy(price, quantity, 'SBIN', 'LIMIT');
+    // response = await kite.KITE.buy(price, quantity, 'SBIN', 'LIMIT');
   } catch (err) {
     console.log(err);
   }

@@ -15,6 +15,7 @@ const password = "gautham123";
 const mlabURL = `mongodb://${mongoUserName}:${password}${mongodbHost}:${mongodbPort}/${mongodbName}`;
 
 let db;
+let data;
 
 async function mongoConnect() {
   try {
@@ -173,7 +174,9 @@ async function processTicks(ticks, OHLC, prevData = undefined) {
 
 const Ticks = {
   buildRenkoWithFixedBricks: async function(ticks, OHLC, brickSize) {
-    let data = await alphaVantage.getAlphaVantageData("NSE:SBIN", "1min");
+    if (renkoFormat.close.length === 0) {
+      data = await alphaVantage.getAlphaVantageData("NSE:SBIN", "1min");
+    }
     processTicks(
       ticks,
       OHLC,
