@@ -61,14 +61,14 @@ dispatcher.onGet("/", function(req, res) {
 });
 
 // Start the server !
-// myFirstServer.listen(PORT, function() {
-//   // Callback triggered when server is successfully listening. Hurray!
-//   console.log("Server listening on: http://localhost:%s", PORT);
-// });
+myFirstServer.listen(PORT, function() {
+  // Callback triggered when server is successfully listening. Hurray!
+  console.log("Server listening on: http://localhost:%s", PORT);
+});
 
 //--------------------server code ends  here----------------------------
 console.log('hello');
-kite.KITE.generateTicks();
+// kite.KITE.generateTicks();
 
 // kite.getInstruments();
 
