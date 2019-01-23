@@ -216,7 +216,7 @@ const Ticks = {
     console.log(
       "--trima---",
       trima,
-      "aroon up",
+      "aroon up....",
       aroonUp,
       "aroon down",
       aroonDown,
