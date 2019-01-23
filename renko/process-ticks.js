@@ -198,8 +198,8 @@ const Ticks = {
     let aroonBarData = 15;
     let aroon = await tulind.indicators.aroon.indicator(
       [
-        renkoConvert.high,
-        renkoConvert.low
+        renkoFormat.high,
+        renkoFormat.low
       ],
       [5]
     );
