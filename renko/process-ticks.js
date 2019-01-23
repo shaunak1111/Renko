@@ -203,13 +203,13 @@ const Ticks = {
       ],
       [5]
     );
-    console.log('aroon', aroon);
+    console.log('aroon...', aroon);
     let aroonDown = aroon[0][aroon[0].length - 1];
     let aroonUp = aroon[1][aroon[1].length - 1];
     let superTrend = calculateSuperTrend(
-      renkoConvert.high,
-      renkoConvert.low,
-      renkoConvert.close,
+      renkoFormat.high,
+      renkoFormat.low,
+      renkoFormat.close,
       3
     );
     console.log("...................renko...................", renkoConvert);
