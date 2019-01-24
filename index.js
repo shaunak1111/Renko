@@ -55,10 +55,10 @@ function handleRequest(request, response) {
 const myFirstServer = http.createServer(handleRequest);
 
 //A sample GET request
-dispatcher.onGet("/", function(req, res) {
-  kite.KITE.generateTicks();
-  res.end("kite services called");
-});
+// dispatcher.onGet("/", function(req, res) {
+//   kite.KITE.generateTicks();
+//   res.end("kite services called");
+// });
 
 // Start the server !
 myFirstServer.listen(PORT, function() {
@@ -68,7 +68,7 @@ myFirstServer.listen(PORT, function() {
 
 //--------------------server code ends  here----------------------------
 console.log('hello');
-// kite.KITE.generateTicks();
+kite.KITE.generateTicks();
 
 // kite.getInstruments();
 
