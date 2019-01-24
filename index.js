@@ -55,16 +55,16 @@ function handleRequest(request, response) {
 const myFirstServer = http.createServer(handleRequest);
 
 //A sample GET request
-// dispatcher.onGet("/", function(req, res) {
-//   kite.KITE.generateTicks();
-//   res.end("kite services called");
-// });
+dispatcher.onGet("/", function(req, res) {
+  kite.KITE.generateTicks();
+  res.end("kite services called");
+});
 
 // Start the server !
-myFirstServer.listen(PORT, function() {
-  // Callback triggered when server is successfully listening. Hurray!
-  console.log("Server listening on: http://localhost:%s", PORT);
-});
+// myFirstServer.listen(PORT, function() {
+//   // Callback triggered when server is successfully listening. Hurray!
+//   console.log("Server listening on: http://localhost:%s", PORT);
+// });
 
 //--------------------server code ends  here----------------------------
 console.log('hello');

@@ -12,7 +12,7 @@
 
 const API_SECRET = "rzgyg4edlvcurw4vp83jl5io9b610x94";
 const API_KEY = "dysoztj41hnta";
-const REQ_TOKEN = "Z05UejaH6gAvoBvl1PsKeebmRptLiZzl";
+const REQ_TOKEN = "ZYJL89OaBjqSS9vTOPZCHe2MKF18AbvY";
 let access_token = "JX9Lneaza6JZJRqeI9yz3YBaBOWXxqyb";
 
 const KiteConnect = require("kiteconnect").KiteConnect;
@@ -44,7 +44,7 @@ const KITE = {
         console.log("acess token", access_token);
         return;
       } catch (err) {
-        console.log("err", err);
+        console.log("err access Token generation", err);
         return err;
       }
     }
