@@ -20,42 +20,46 @@ const Gautham = {
     const { open, high, low, close, volume } = data;
     const LTP = tick.last_price;
 
-
+    for (let i = close.length - 1; i < close.length && i >= 0; i++) {
       // if prev is green and current is green
       if (
+        close.length > 0 &&
         !tradeInitiated &&
-        // LTP > superTrend &&
-        aroonDown <= aroonThreshold &&
-        aroonUp >= aroonThreshold &&
+        calculateBar(i) > 0 &&
         trima < LTP
       ) {
         buy(LTP, taradedAmount);
         // prev red and current red
       } else if (
+        close.length > 0 &&
         !tradeInitiated &&
-        // LTP < superTrend &&
-        aroonDown >= aroonThreshold &&
-        aroonUp <= aroonThreshold &&
+        calculateBar(i) < 0 &&
         trima > LTP
       ) {
         sell(LTP, taradedAmount);
       } else if (
         tradeInitiated &&
-        sellOrBuy === 'buy' &&
-        // LTP < superTrend &&
-        aroonDown >= aroonThreshold &&
-        aroonUp <= aroonThreshold &&
-        trima > LTP) { // sell after buy trade initiated
-          sell(LTP, taradedAmount);
-      } else if (
-        tradeInitiated &&
-        sellOrBuy === 'sell' &&
-        // LTP > superTrend &&
-        aroonDown <= aroonThreshold &&
-        aroonUp >= aroonThreshold &&
-        trima < LTP) { // buy after sell trade initiated
-          buy(LTP, taradedAmount);
+        sellOrBuy === "buy" &&
+        calculateBar(i) < 0 &&
+        i === close.length - 1 &&
+        trima >= LTP
+      ) {
+        sell(LTP, taradedAmount);
+        sell(LTP, taradedAmount);
       }
+      // sell when triple exponential 14 day tema <  9 day tema
+      else if (
+        tradeInitiated &&
+        sellOrBuy === "sell" &&
+        calculateBar(i) > 0 &&
+        // calculateBar(i - 1) > 0 &&
+        i === close.length - 1 &&
+        trima <= LTP
+      ) {
+        buy(LTP, taradedAmount);
+        buy(LTP, taradedAmount);
+      }
+    }
     console.log("profit", profit);
   }
 };
@@ -64,15 +68,15 @@ async function sell(price, quantity) {
   // TODO - check response
   let response;
   try {
-    response = await kite.KITE.sell(price, quantity, 'SBIN', 'LIMIT');
+    response = await kite.KITE.sell(price, quantity, "SBIN", "LIMIT");
   } catch (err) {
     console.log(err);
   }
 
-  if (response.status !== 'error') {
+  if (response.status !== "error") {
     tradeInitiated = !tradeInitiated;
-    sellOrBuy = 'sell';
-    console.log('sell order success');
+    sellOrBuy = "sell";
+    console.log("sell order success");
   }
 }
 
@@ -80,15 +84,15 @@ async function buy(price, quantity) {
   // Todo -: check here
   let response;
   try {
-    response = await kite.KITE.buy(price, quantity, 'SBIN', 'LIMIT');
+    response = await kite.KITE.buy(price, quantity, "SBIN", "LIMIT");
   } catch (err) {
     console.log(err);
   }
 
-  if (response.status !== 'error') {
+  if (response.status !== "error") {
     tradeInitiated = !tradeInitiated;
-    sellOrBuy = 'buy';
-    console.log('buy order success');
+    sellOrBuy = "buy";
+    console.log("buy order success");
   }
 }
 
