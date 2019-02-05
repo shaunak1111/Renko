@@ -221,8 +221,10 @@ const Ticks = {
       renkoConvert.close,
       3
     );
-    console.log("...................renko...................", renkoConvert);
+    // console.log("...................renko...................", renkoConvert);
     console.log(
+      "trima-manual",
+      trimaManual,
       "--trima---",
       trima,
       "aroon up",
