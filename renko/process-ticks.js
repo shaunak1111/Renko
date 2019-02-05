@@ -3,6 +3,7 @@ const processingEngine = require("./kite-order");
 const tulind = require("tulind");
 const kite = require("../common/kite-service");
 const alphaVantage = require("../common/alphavantage-data");
+const indicators = require("../common/Indicators");
 
 const axios = require("axios");
 //-------------------mongo db starts here------------------------
@@ -18,10 +19,9 @@ let db;
 
 async function mongoConnect() {
   try {
-    db = await MongoClient.connect(
-      mlabURL,
-      { useNewUrlParser: true }
-    ).then(client => client.db());
+    db = await MongoClient.connect(mlabURL, { useNewUrlParser: true }).then(
+      client => client.db()
+    );
     let collection = await db.collection("renko_bar");
     return (data = await collection.find({}).toArray());
   } catch (err) {
@@ -73,7 +73,7 @@ function calculateSuperTrend(high, low, close, multiplier) {
   };
   let calculatedATR = ATR.calculate(input);
   calculatedATR = calculatedATR[calculatedATR.length - 1];
-  console.log('atr', calculatedATR);
+  console.log("atr", calculatedATR);
 
   // calculation of last high prices
   let lastHigh = high[high.length - 1];
@@ -156,7 +156,7 @@ async function processTicks(ticks, OHLC, prevData = undefined) {
   //   }
 
   // new data has not been genereated genereate previous day data
-  if (renkoFormat.close.length === 0) {
+  if (prevData && renkoFormat.close.length === 0) {
     renkoFormat = alphaVantage.processAlphavantageData(prevData);
   }
 
@@ -173,12 +173,21 @@ async function processTicks(ticks, OHLC, prevData = undefined) {
 
 const Ticks = {
   buildRenkoWithFixedBricks: async function(ticks, OHLC, brickSize) {
-    let data = await alphaVantage.getAlphaVantageData("NSE:SBIN", "1min");
-    processTicks(
-      ticks,
-      OHLC,
-      Array.prototype.reverse.apply(data.data["Time Series (1min)"])
-    );
+    try {
+      if (renkoFormat.close.length === 0) {
+        let data = await alphaVantage.getAlphaVantageData("NSE:SBIN", "1min");
+        processTicks(
+          ticks,
+          OHLC,
+          Array.prototype.reverse.apply(data.data["Time Series (1min)"])
+        );
+      } else {
+        processTicks(ticks, OHLC, undefined);
+      }
+    } catch (e) {
+      console.log("alphavantage error");
+    }
+
     console.log("renko data before format", renkoFormat);
     let renkoConvert = renko.renkoBrick(renkoFormat, brickSize);
     let renkoLen = renkoConvert.close.length;
@@ -190,17 +199,20 @@ const Ticks = {
       [period]
     );
     trima = trima[0][trima[0].length - 1];
+
+    let trimaManual = indicators.triangularMovingAverage(
+      renkoConvert.close,
+      10
+    );
+    console.log("trima-manual-------", trimaManual);
     //-----------------Trima ends------------------------
 
     let aroonBarData = 15;
     let aroon = await tulind.indicators.aroon.indicator(
-      [
-        renkoConvert.high,
-        renkoConvert.low
-      ],
+      [renkoConvert.high, renkoConvert.low],
       [5]
     );
-    console.log('aroon', aroon);
+    console.log("aroon", aroon);
     let aroonDown = aroon[0][aroon[0].length - 1];
     let aroonUp = aroon[1][aroon[1].length - 1];
     let superTrend = calculateSuperTrend(
@@ -224,7 +236,7 @@ const Ticks = {
       renkoConvert,
       ticks,
       brickSize,
-      trima,
+      trimaManual,
       aroonUp,
       aroonDown,
       superTrend

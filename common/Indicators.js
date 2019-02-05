@@ -4,7 +4,8 @@ const Indicators = {
   triangularMovingAverage: (values, period) => {
     let sumOfSMA = 0;
     for (let i = 1; i <= period; i++) {
-      sumOfSMA += SMA.calculate({ period: i, values: values });
+      const simpleMovingAv = SMA.calculate({ period: i, values: values });
+      sumOfSMA += simpleMovingAv[simpleMovingAv.length - 1];
     }
 
     return sumOfSMA / period;
@@ -15,22 +16,20 @@ const Indicators = {
     let highIndex;
     let lowIndex;
 
-    high.forEach((high,low,index) => {
-        if (!highestHigh || high > highestHigh) {
-            highestHigh = high;
-            highIndex = period - index;
-        }
+    high.forEach((high, low, index) => {
+      if (!highestHigh || high > highestHigh) {
+        highestHigh = high;
+        highIndex = period - index;
+      }
 
-        if (!lowestLow || low[index] < lowestLow) {
-            lowestLow = low[index];
-            lowIndex = periods - index - 1;
-        }
+      if (!lowestLow || low[index] < lowestLow) {
+        lowestLow = low[index];
+        lowIndex = periods - index - 1;
+      }
     });
-    return {
-
-    }
+    return {};
   },
-  superTrend : (high, low, close, multiplier) => {
+  superTrend: (high, low, close, multiplier) => {
     const ATR = require("technicalindicators").ATR;
     const input = {
       high: high,

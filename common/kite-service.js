@@ -12,8 +12,8 @@
 
 const API_SECRET = "rzgyg4edlvcurw4vp83jl5io9b610x94";
 const API_KEY = "dysoztj41hntm1ma";
-const REQ_TOKEN = "d9Nzoyj0DcT6DjPg1P1puZersWl4cKav";
-let access_token = "JX9Lneaza6JZJRqeI9yz3YBaBOWXxqyb";
+const REQ_TOKEN = "M03pNGffad2vk5JuNzHYM5xnMowfLY2W";
+let access_token = "3pJxiPHE0HQCEHwUbqKJSCV2T30Mdp72";
 
 const KiteConnect = require("kiteconnect").KiteConnect;
 
@@ -37,7 +37,7 @@ function accessTokenGenerator() {
 
 const KITE = {
   generateTicks: async () => {
-    if (access_token === '') {
+    if (access_token === "") {
       try {
         let token = await accessTokenGenerator();
         access_token = token.access_token;
@@ -49,25 +49,25 @@ const KITE = {
       }
     }
 
-  try {
-    kc = new KiteConnect({
-      api_key: API_KEY,
-      access_token: access_token
-    });
-    
-    ticker = new KiteTicker({
-      api_key: API_KEY,
-      access_token: access_token
-    });
-  } catch (e) {
-    console.log('kite error', e);
-  }
+    try {
+      kc = new KiteConnect({
+        api_key: API_KEY,
+        access_token: access_token
+      });
+
+      ticker = new KiteTicker({
+        api_key: API_KEY,
+        access_token: access_token
+      });
+    } catch (e) {
+      console.log("kite error", e);
+    }
 
     ticker.connect();
     ticker.on("connect", subscribe);
     ticker.on("ticks", onTicks);
     ticker.autoReconnect(true, 300, 20);
-    console.log('connected', ticker.connected());
+    console.log("connected", ticker.connected());
     ticker.on("reconnecting", function(reconnect_interval, reconnections) {
       console.log(
         "Reconnecting: attempt - ",
@@ -79,9 +79,9 @@ const KITE = {
     ticker.on("noreconnect", function() {
       console.log("noreconnect");
     });
-    ticker.on('error', (error) => {
-      console.log('error', error);
-    })
+    ticker.on("error", error => {
+      console.log("error", error);
+    });
   },
   getInstruments: function() {
     kc.getInstruments(["NSE"]).then(res => {
@@ -140,7 +140,7 @@ async function onTicks(ticks) {
   if (diff / (1000 * 60) >= 1) {
     OHLC.close = ticks[0].last_price;
     console.log("ticks", ticks[0]);
-    processTicks.buildRenkoWithFixedBricks(ticks[0], OHLC, 0.50);
+    processTicks.buildRenkoWithFixedBricks(ticks[0], OHLC, 0.5);
     previousTime = ticks[0].last_trade_time;
     // the current close is the next open for the OHLC
     OHLC.open = ticks[0].last_price;

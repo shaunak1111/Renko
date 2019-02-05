@@ -20,6 +20,20 @@ const Gautham = {
     const { open, high, low, close, volume } = data;
     const LTP = tick.last_price;
 
+    function calculateBar(index) {
+      // console.log(
+      //   "bar",
+      //   index,
+      //   "close",
+      //   close[index],
+      //   "open",
+      //   open[index],
+      //   'diff',
+      //   close[index] - open[index]
+      // );
+      return close[index] - open[index];
+    }
+
     for (let i = close.length - 1; i < close.length && i >= 0; i++) {
       // if prev is green and current is green
       if (
@@ -68,7 +82,7 @@ async function sell(price, quantity) {
   // TODO - check response
   let response;
   try {
-    response = await kite.KITE.sell(price, quantity, "SBIN", "LIMIT");
+    response = await kite.KITE.sell(price, quantity, "SBIN", "MARKET");
   } catch (err) {
     console.log(err);
   }
@@ -76,7 +90,7 @@ async function sell(price, quantity) {
   if (response.status !== "error") {
     tradeInitiated = !tradeInitiated;
     sellOrBuy = "sell";
-    console.log("sell order success");
+    console.log("sell order success", response);
   }
 }
 
@@ -84,7 +98,7 @@ async function buy(price, quantity) {
   // Todo -: check here
   let response;
   try {
-    response = await kite.KITE.buy(price, quantity, "SBIN", "LIMIT");
+    response = await kite.KITE.buy(price, quantity, "SBIN", "MARKET");
   } catch (err) {
     console.log(err);
   }
@@ -92,7 +106,7 @@ async function buy(price, quantity) {
   if (response.status !== "error") {
     tradeInitiated = !tradeInitiated;
     sellOrBuy = "buy";
-    console.log("buy order success");
+    console.log("buy order success", response);
   }
 }
 
