@@ -4,7 +4,8 @@ const Indicators = {
   triangularMovingAverage: (values, period) => {
     let sumOfSMA = 0;
     for (let i = 1; i <= period; i++) {
-      const simpleMovingAv = SMA.calculate({ period: i, values: values });
+      const inputVal = values.slice(values.length - 1 - 10, values.length - 1);
+      const simpleMovingAv = SMA.calculate({ period: i, values: inputVal });
       sumOfSMA += simpleMovingAv[simpleMovingAv.length - 1];
     }
 
