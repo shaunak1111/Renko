@@ -3,7 +3,7 @@ let tradingPrice = 0;
 sellOrBuy = "";
 let tradeInitiated = false;
 const taradedAmount = 1;
-const LTPThreshold = 0.45;
+const LTPThreshold = 0.4;
 const aroonThreshold = 50;
 const kite = require("../common/kite-service");
 
@@ -40,6 +40,7 @@ const Gautham = {
         close.length > 0 &&
         !tradeInitiated &&
         calculateBar(i) > 0 &&
+        LTP >= LTPThreshold * bricksize + close[i] &&
         trima < LTP
       ) {
         buy(LTP, taradedAmount);
@@ -48,6 +49,7 @@ const Gautham = {
         close.length > 0 &&
         !tradeInitiated &&
         calculateBar(i) < 0 &&
+        LTP <= close[i] - LTPThreshold * bricksize &&
         trima > LTP
       ) {
         sell(LTP, taradedAmount);
@@ -55,9 +57,13 @@ const Gautham = {
         tradeInitiated &&
         sellOrBuy === "buy" &&
         calculateBar(i) < 0 &&
+        // calculateBar(i - 1) < 0 &&
+        LTP <= close[i] - LTPThreshold * bricksize &&
         i === close.length - 1 &&
         trima >= LTP
       ) {
+        // we can double the traded amount and do one sell call
+        // but margins will not be available and hence order will be rejected
         sell(LTP, taradedAmount);
         sell(LTP, taradedAmount);
       }
@@ -68,8 +74,11 @@ const Gautham = {
         calculateBar(i) > 0 &&
         // calculateBar(i - 1) > 0 &&
         i === close.length - 1 &&
+        LTP >= close[i] + LTPThreshold * bricksize &&
         trima <= LTP
       ) {
+        // we can double the traded amount and do one sell call
+        // but margins will not be available and hence order will be rejected
         buy(LTP, taradedAmount);
         buy(LTP, taradedAmount);
       }
