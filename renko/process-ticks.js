@@ -238,7 +238,7 @@ const Ticks = {
       renkoConvert,
       ticks,
       brickSize,
-      trimaManual,
+      trima,
       aroonUp,
       aroonDown,
       superTrend
