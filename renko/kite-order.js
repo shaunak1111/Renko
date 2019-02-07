@@ -97,6 +97,7 @@ async function sell(price, quantity) {
   }
 
   if (response.status !== "error") {
+    // response.order_id we get from response
     tradeInitiated = !tradeInitiated;
     sellOrBuy = "sell";
     console.log("sell order success", response);
