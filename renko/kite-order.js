@@ -40,7 +40,6 @@ const Gautham = {
         close.length > 0 &&
         !tradeInitiated &&
         calculateBar(i) > 0 &&
-        LTP >= LTPThreshold * bricksize + close[i] &&
         trima < LTP
       ) {
         buy(LTP, taradedAmount);
@@ -49,7 +48,6 @@ const Gautham = {
         close.length > 0 &&
         !tradeInitiated &&
         calculateBar(i) < 0 &&
-        LTP <= close[i] - LTPThreshold * bricksize &&
         trima > LTP
       ) {
         sell(LTP, taradedAmount);
@@ -58,7 +56,6 @@ const Gautham = {
         sellOrBuy === "buy" &&
         calculateBar(i) < 0 &&
         // calculateBar(i - 1) < 0 &&
-        LTP <= close[i] - LTPThreshold * bricksize &&
         i === close.length - 1 &&
         trima >= LTP
       ) {
@@ -74,7 +71,6 @@ const Gautham = {
         calculateBar(i) > 0 &&
         // calculateBar(i - 1) > 0 &&
         i === close.length - 1 &&
-        LTP >= close[i] + LTPThreshold * bricksize &&
         trima <= LTP
       ) {
         // we can double the traded amount and do one sell call
