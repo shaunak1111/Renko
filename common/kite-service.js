@@ -12,8 +12,8 @@
 
 const API_SECRET = "rzgyg4edlvcurw4vp83jl5io9b610x94";
 const API_KEY = "dysoztj41hntm1ma";
-const REQ_TOKEN = "EeSkGzPLyZyX3m6fAhCXoMtVFIh1hLvE";
-let access_token = "pkM5t9W1VutFAp0iJTmG6pEf9IeoXjJj";
+const REQ_TOKEN = "1SynfAO0aZ9EdxUr2SCSvRolQYQFv4lr";
+let access_token = "wTCiS4yPz7of7Nv4FYnomHm0Ko3pe5S4";
 
 const KiteConnect = require("kiteconnect").KiteConnect;
 
